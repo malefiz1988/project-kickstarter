@@ -131,7 +131,7 @@ def saveReadCleanData(RSEED=42):
     df is the dataset to work with, while df_backUp represents the testingData for the end testing.
     """
     
-    df, df_backUp = loadData(RS=RSEED)
+    df, df_backUp = loadData(RSEED)
 
     df = catCleaner(df)
     df = groupCountries(df)
@@ -147,14 +147,14 @@ def saveReadCleanData(RSEED=42):
     df_backUp.to_csv("./data/df_backUp.csv",index=False)
 
 def returnReadCleanData(RSEED=42):
-        """
-        Opens the filepath ./data/df_clean.csv, reads in all the files starting with 'Kick', drops Trash columns, adds a column for grouped Countries (most important) and turns the category column into two seperate columns having read the category_name and slug_name from the original column. category is then dropped. 
+    """
+    Opens the filepath ./data/df_clean.csv, reads in all the files starting with 'Kick', drops Trash columns, adds a column for grouped Countries (most important) and turns the category column into two seperate columns having read the category_name and slug_name from the original column. category is then dropped. 
     
     Two dataFrames are returned -> return df, df_backUp
     
     df is the dataset to work with, while df_backUp represents the testingData for the end testing.
     """
-    df, df_backUp = loadData(RS=RSEED)
+    df, df_backUp = loadData(RSEED)
 
     df = catCleaner(df)
     df = groupCountries(df)
@@ -167,3 +167,13 @@ def returnReadCleanData(RSEED=42):
     df_backUp = categorizeObjects(df_backUp)
 
     return df, df_backUp
+
+
+if __name__ == "__main__":
+    main()
+    
+    
+def main():
+    print("los")
+    RSEED=42
+    saveReadCleanData(RSEED)

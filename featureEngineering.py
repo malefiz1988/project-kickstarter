@@ -154,9 +154,9 @@ def preprocessData(df,test_size = 0.2, split = True ):
     ])
     
     #preprocess validationData
-    preprocessor.fit(X_train)
-    X_train = preprocessor.transform(X_train)
-    X_test = preprocessor.transform(X_test)
+    preprocessor.fit(X)
+    X = preprocessor.transform(X)
+    #X_test = preprocessor.transform(X_test)
     
     #extract feature names
     #cat_cols= preprocessor.transformers_[1][1].named_steps["1hot"].get_feature_names(cat_features)
