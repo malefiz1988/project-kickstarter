@@ -21,7 +21,7 @@ from datetime import datetime
 
 RSEED=42
 
-def loadData(RSEED=42):
+def loadData(RS=42):
     i=0
     df_raw = pd.DataFrame()
     for f in os.listdir("./data"):
@@ -30,9 +30,10 @@ def loadData(RSEED=42):
             df_raw = pd.concat([df_raw, da], axis = 0)
             i+=1
             print(i,f)
+    df_raw = df_raw.drop_duplicates(subset='id', keep='first')
     df_raw.reset_index(drop=True, inplace=True)
-    df, df_backUp = train_test_split(df_raw,test_size=0.1,stratify=df_raw.state,random_state=RSEED)
-    df_backUp.to_csv("./data/df_backUp.csv")
+    df, df_backUp = train_test_split(df_raw,test_size=0.1,stratify=df_raw.state,random_state=RS)
+    #df_backUp.to_csv("./data/df_backUp.csv")
     return df, df_backUp
 
 def cat2name(cat):
@@ -70,35 +71,20 @@ def timeline(t, m="dt"):
     elif m == "dt":
         return datetime.fromtimestamp(t)
 
-def prepForModel(df):
+def dropTrashCols(df):
     drop_cols = [
-        'blurb',
-        'creator',
-        'currency',
-        'currency_symbol',
-        'currency_trailing_code',
-        'current_currency',
-        'friends',
-        'fx_rate',
-        'id',
         'is_backing',
         'is_starred',
-        'location',
-        'name',
+        'currency_symbol',
+        'current_currency', 
+        'friends',
+        'id',
         'permissions',
         'photo',
-        'profile',
-        'slug',
-        'source_url',
-        'static_usd_rate',
         'urls',
-        'usd_type'
+        "spotlight"
     ]
     df.drop(drop_cols, inplace=True, axis = 1)
-    for c in df.columns: 
-        if df[c].dtype == "object": 
-            df[c] = df[c].astype("category") 
-    df.dropna(inplace=True)
     return df
 
 def groupCountries(df):
@@ -129,21 +115,6 @@ def groupCountries(df):
     df['cgrouped']  = df['country'].map(map_dictionary)
     return df
 
-def dropTrashCols(df):
-    drop_cols = [
-        'is_backing',
-        'is_starred',
-        'currency_symbol',
-        'current_currency', 
-        'friends',
-        'id',
-        'permissions',
-        'photo',
-        'urls'
-    ]
-    df.drop(drop_cols, inplace=True, axis = 1)
-    return df
-    
 def categorizeObjects(df):
     for c in df.columns: 
         if df[c].dtype == "object": 
@@ -151,27 +122,48 @@ def categorizeObjects(df):
     df.dropna(inplace=True)
     return df
 
-def trainEval(df, clf):
-    y = df.state
-    X = df.drop("state", axis=1)
+def saveReadCleanData(RSEED=42):
+    """
+    Opens the filepath ./data/df_clean.csv, reads in all the files starting with 'Kick', drops Trash columns, adds a column for grouped Countries (most important) and turns the category column into two seperate columns having read the category_name and slug_name from the original column. category is then dropped. 
+    
+    Nothing is returned but two datasets are saved in following location ./data/df_clean.csv and ./data/df_backUp.csv
+    
+    df is the dataset to work with, while df_backUp represents the testingData for the end testing.
+    """
+    
+    df, df_backUp = loadData(RS=RSEED)
 
-    X = pd.get_dummies(X)
+    df = catCleaner(df)
+    df = groupCountries(df)
+    df = dropTrashCols(df)
+    df = categorizeObjects(df)
 
-    X_train, X_test,y_train, y_test = train_test_split(X,y,test_size=0.3,stratify=y,random_state=RSEED)
+    df_backUp = catCleaner(df_backUp)
+    df_backUp = groupCountries(df_backUp)
+    df_backUp = dropTrashCols(df_backUp)
+    df_backUp = categorizeObjects(df_backUp)
 
-    clf.fit(X_train, y_train)
+    df.to_csv("./data/df_clean.csv",index=False)
+    df_backUp.to_csv("./data/df_backUp.csv",index=False)
 
-    y_pred_train = clf.predict(X_train)
-    y_pred_test = clf.predict(X_test)
+def returnReadCleanData(RSEED=42):
+        """
+        Opens the filepath ./data/df_clean.csv, reads in all the files starting with 'Kick', drops Trash columns, adds a column for grouped Countries (most important) and turns the category column into two seperate columns having read the category_name and slug_name from the original column. category is then dropped. 
+    
+    Two dataFrames are returned -> return df, df_backUp
+    
+    df is the dataset to work with, while df_backUp represents the testingData for the end testing.
+    """
+    df, df_backUp = loadData(RS=RSEED)
 
-    print(sm.classification_report(y_train, y_pred_train));
+    df = catCleaner(df)
+    df = groupCountries(df)
+    df = dropTrashCols(df)
+    df = categorizeObjects(df)
 
-    print(sm.classification_report(y_test, y_pred_test))
+    df_backUp = catCleaner(df_backUp)
+    df_backUp = groupCountries(df_backUp)
+    df_backUp = dropTrashCols(df_backUp)
+    df_backUp = categorizeObjects(df_backUp)
 
-da = loadData()
-da = catCleaner(da)
-da = prepForModel(da)
-clf = LogisticRegression(random_state=RSEED,tol = 0.01, max_iter=50)
-trainEval(da, clf)
-
-
+    return df, df_backUp
