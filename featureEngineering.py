@@ -28,7 +28,7 @@ from sklearn.linear_model import LogisticRegression
 
 RSEED = 42
 
-def dropCols(df):
+def dropCols(df, drop_backers_count = True, drop_staff_pick = True):
     drop_cols = [
         'blurb',
         'creator',
@@ -50,7 +50,12 @@ def dropCols(df):
         'disable_communication',
         'usd_pledged',
         #"backers_count",
+        #"staff_pick",
     ]
+    if drop_backers_count == True: drop_cols.append("backers_count")
+    if drop_staff_pick == True : drop_cols.append("staff_pick")
+    
+    
     df.drop(drop_cols, inplace=True, axis = 1)
     for c in df.columns: 
         if df[c].dtype == "object": 
@@ -102,39 +107,65 @@ def dateTimeUpdate(df):
     )
     return df
 
-def preprocessData(df,test_size = 0.2, split = True ):
-    """This function takes in a DataFrame, drops not relevant columns, does feature engineering, onehots the categorical columns and gives back the whole data as X, y or split data set as X_train, X_test, y_train, y_test
-    
-    Arguments are 
-    
-    df: DataFrame
-    testsize: float from 0..1 setting the proportion of the whole dataset to split into training and testdata. test_size marks the size of the testdataset
-    split: 
-        True -> return X_train, X_test, y_train, y_test
-        False -> return X, y
-    """
 
+
+
+
+
+def prepDataFrameForPreprocessor(df, drop_backers_count = True, drop_staff_pick = True):
+    """
+        drops Columns
+        creates time deltas and drops timestamps
+        drops rows without state failed and successful
+        transforms state column with labelencoder to 1 = successful and 0 = failed
+        
+        returns the prepared dataFrame
+    """
     #df = pd.read_csv('data/df_clean.csv')
-    df = dropCols(df) #drop unnecessary columns
+    df = dropCols(df,drop_backers_count,drop_staff_pick) #drop unnecessary columns
     df = dateTimeUpdate(df) #create time delta columns, add these and drop the original timesptamps
     #df.drop(df.columns[df.columns.str.contains('unnamed',case = False)],axis = 1, inplace = True)
-    
-    #get categorical features
-    cat_features = list(df.columns[df.dtypes=='category'])
-    cat_features.remove('state')
-    
-    #get numerical features
-    num_features = list(df.columns[df.dtypes!='category'])
-
-    #drop all rows not containing the prediction classes
-    X = df[(df['state']=='failed') | (df['state']=='successful')].drop("state", axis=1)
-    y = df[(df['state']=='failed') | (df['state']=='successful')]["state"]
-    
+    df = df[(df['state']=='failed') | (df['state']=='successful')]
+     
     #labelencode y from string to int
     label_encoder = preprocessing.LabelEncoder()
     label_encoder.fit(["failed","successful"])
-    y = label_encoder.transform(y)
+        
+    df["state"] = label_encoder.transform(df.state)
+    
+    return df
+        
+    
+def fitPreprocessor(df):
+    """
+        Argument: DataFrame
+    
+        fits the preprocessor of the dataFrame
+        imputer_num -> median
+        std_scaler
+        
+        imputer_cat -> constant fill with missing
+        1hot: ignore
+        
+        fits the preprocessor
+                
+        returns the preprocessor
+        
+        
+    """
 
+    for c in df.columns: 
+        if df[c].dtype == "object": 
+            df[c] = df[c].astype("category") 
+
+    #get categorical features
+    cat_features = list(df.columns[df.dtypes=='category'])
+    #cat_features.remove('state')
+    
+    #get numerical features
+    num_features = list(df.columns[df.dtypes!='category'])
+    num_features.remove('state')
+    
     # Pipeline for numerical features 
     num_pipeline = Pipeline([
         ('imputer_num', SimpleImputer(strategy='median')),
@@ -154,18 +185,35 @@ def preprocessData(df,test_size = 0.2, split = True ):
     ])
     
     #preprocess validationData
+    X = df.drop("state", axis=1)
+    
     preprocessor.fit(X)
-    X = preprocessor.transform(X)
-    #X_test = preprocessor.transform(X_test)
     
-    #extract feature names
-    #cat_cols= preprocessor.transformers_[1][1].named_steps["1hot"].get_feature_names(cat_features)
-    #features = list(num_features) + list(cat_cols)
+    return preprocessor
     
-    #split the data
-    if (split == True):
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size,stratify=y, random_state=RSEED)
-        return X_train, X_test, y_train, y_test
-    else:
-        return X, y
-   
+    
+    
+    
+    
+    
+    
+    
+#drop all rows not containing the prediction classes
+
+
+# 
+# #preprocessor = fitPreprocesser(test_size = test_size, split = split, drop_backers_count = drop_backers_count, drop_staff_pick = drop_staff_pick )
+# X = preprocessor.transform(X)
+# #X_test = preprocessor.transform(X_test)
+# 
+# #extract feature names
+# #cat_cols= preprocessor.transformers_[1][1].named_steps["1hot"].get_feature_names(cat_features)
+# #features = list(num_features) + list(cat_cols)
+# 
+# #split the data
+# if (split == True):
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size,stratify=y, random_state=RSEED)
+#     return X_train, X_test, y_train, y_test
+# else:
+#     return X, y
+#

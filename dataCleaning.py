@@ -169,11 +169,13 @@ def returnReadCleanData(RSEED=42):
     return df, df_backUp
 
 
-if __name__ == "__main__":
-    main()
     
     
 def main():
     print("los")
     RSEED=42
     saveReadCleanData(RSEED)
+    
+    
+if __name__ == "__main__":
+    main()
