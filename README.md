@@ -10,7 +10,15 @@ This dataset includes kickstarter data from 2009 - 2019 with over 200.000 projec
 
 Target of this project: Making correct prediction if campaign will be sucessful or not by use of three different machine learning algorithms. A campaign is successful when the collected amount (=pledged) is the same or greater than the requested amount (=goal).
 
+---
 ## Content
 
-1. Exploratory Data Analysis [Notebook](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_EDA.ipynb)
+1. Exploratory Data Analysis Notebook - [Kickstarter_EDA](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_EDA.ipynb)
+2. Notebook for Modeling Algorithms - [Kickstarter_Modeling](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_Modeling.ipynb)
+3. Testing Notebook for Predicting Success - [Kickstarter_Model_Testing](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_Model_Testing.ipynb)
+4. Python Script to fit all Models, including Data Cleaning - [doAll](https://github.com/malefiz1988/project-kickstarter/blob/main/doAll.py)
+5. Presentation Slides - [Kickstarter_Presentation](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_Presentation.pdf)
+
+---
+#### by Birte, Phillip & Julius
 
