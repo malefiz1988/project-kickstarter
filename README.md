@@ -16,7 +16,7 @@ Target of this project: Making correct prediction if campaign will be sucessful 
 1. Exploratory Data Analysis Notebook - [Kickstarter_EDA](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_EDA.ipynb)
 2. Notebook for Modeling Algorithms - [Kickstarter_Modeling](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_Modeling.ipynb)
 3. Testing Notebook for Predicting Success - [Kickstarter_Model_Testing](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_Model_Testing.ipynb)
-4. Python Script to fit all Models, including Data Cleaning and the Split into Training and final Test Data - [doAll](https://github.com/malefiz1988/project-kickstarter/blob/main/doAll.py)
+4. Python Script to fit all Models, including Data Cleaning and the Split into Training and final Test Data - [doAll](https://github.com/malefiz1988/project-kickstarter/blob/main/doAll.py) - Note: it is necessary to create three folders ('data', 'images', 'models') and place the raw data from Kickstarter in the data-directory in the first level.
 5. Presentation Slides - [Kickstarter_Presentation](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_Presentation.pdf)
 
 ---
