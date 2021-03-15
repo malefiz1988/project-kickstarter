@@ -12,4 +12,5 @@ Target of this project: Making correct prediction if campaign will be sucessful 
 
 ## Content
 
+1. Exploratory Data Analysis [Notebook](https://github.com/malefiz1988/project-kickstarter/blob/main/Kickstarter_EDA.ipynb)
 
